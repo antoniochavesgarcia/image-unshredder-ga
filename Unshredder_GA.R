@@ -44,27 +44,19 @@ TSP_resolver <- ga(type = "permutation", popSize = popSize, pmutation = mutProb,
 
 
 # Grafica de comparativa de crecimiento del Fitness
-ggplot() +  geom_line(color="darkblue", size=1, aes(x=no_iter, y=best_fitness)) + theme(plot.title = element_text(hjust = 0.5)) +
+ggplot() +  geom_line(color="darkblue", size=1, aes(x=0:(maxIter-1), y=TSP_resolver@summary[, "max"])) + 
+  theme(plot.title = element_text(hjust = 0.5)) +
   labs(title = "Mejor fitness por iteración aplicando la distancia de Manhattan",x="Número de iteraciones", y="Fitness de la mejor solución en dicha iteración")
 
 get_best_sol <- function(solution, iteration){
   return(solution@bestSol[[round(iteration)]][1, ])
 }
 
+# Guardamos las mejores ordenaciones segun el criterio definido en el informe.
 correct_image_row_order <- list()
 correct_image_row_order[[as.character(round(maxIter/3))]] <- get_best_sol(TSP_resolver, maxIter/3)-1
 correct_image_row_order[[as.character(round(maxIter*2/3))]] <- get_best_sol(TSP_resolver, maxIter*2/3)-1
 correct_image_row_order[[as.character(round(maxIter))]] <- get_best_sol(TSP_resolver, maxIter)-1
 
 write.table(correct_image_row_order, file=paste("images\\",imageNumber,"\\",distanceMeasure,"\\row_order.csv", sep=""), sep=",")
-
-# Guardamos checkpoints de las imagenes a cada tercio de ejecución
-# write.table(image[TSP_resolver@bestSol[[round(maxIter/3)]][1, ], ], row.names = FALSE, col.names = FALSE,
-#             file = paste("images\\",imageNumber,"\\",distanceMeasure,"\\nice_",round(maxIter/3),"_",distanceMeasure,".txt", sep = ""))
-# 
-# write.table(image[TSP_resolver@bestSol[[round(maxIter*2/3)]][1, ], ], row.names = FALSE, col.names = FALSE,
-#             file = paste("images\\",imageNumber,"\\",distanceMeasure,"\\nice_",round(maxIter*2/3),"_",distanceMeasure,".txt", sep = ""))
-# 
-# write.table(image[TSP_resolver@bestSol[[maxIter]][1, ], ], row.names = FALSE, col.names = FALSE,
-#             file = paste("images\\",imageNumber,"\\",distanceMeasure,"\\nice_",maxIter,"_",distanceMeasure,".txt", sep = ""))
 
