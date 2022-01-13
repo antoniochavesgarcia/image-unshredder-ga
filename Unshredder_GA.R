@@ -1,11 +1,11 @@
 ################# PARAMETROS ################# 
 set.seed(77686486) # Establecemos una semilla para realizar las comparaciones de manera justa.
-imageNumber <- 2
+imageNumber <- 0
 distanceMeasure <- "euclidean" # "manhattan" ó "euclidean"
-popSize <- 300  # Tamaño de la poblacion. imagen0 = 150 | imagen1 = 200 | imagen2 = ? 
+popSize <- 150  # Tamaño de la poblacion. imagen0 = 150 | imagen1 = 200 | imagen2 = 200
 mutProb <- 0.10 # Probabilidad de mutación
 cxProb  <- 0.8  # Probabilidad de cruce
-maxIter <- 100000 # Maximo numero de iteraciones. imagen0 = 15000 | imagen1 = 30000 | imagen2 ???= +100K CURRENT = 30K
+maxIter <- 15000 # Maximo numero de iteraciones. imagen0 = 15000 | imagen1 = 30000 | imagen2 = 100000
 
 ############### END PARAMETROS ############### 
 
@@ -44,27 +44,27 @@ TSP_resolver <- ga(type = "permutation", popSize = popSize, pmutation = mutProb,
 
 
 # Grafica de comparativa de crecimiento del Fitness
-best_fitness <- TSP_resolver@summary[, "max"]
-no_iter <- 0:(nrow(TSP_resolver@summary)-1)
+ggplot() +  geom_line(color="darkblue", size=1, aes(x=no_iter, y=best_fitness)) + theme(plot.title = element_text(hjust = 0.5)) +
+  labs(title = "Mejor fitness por iteración aplicando la distancia de Manhattan",x="Número de iteraciones", y="Fitness de la mejor solución en dicha iteración")
 
-ggplot(data=data.frame(no_iter, best_fitness), aes(x=no_iter, y=best_fitness)) +
-  geom_line(color="darkblue", size=1) +
-  labs(title = "Mejor fitness por iteración aplicando la distancia de Manhattan",x="Número de iteraciones", y="Fitness de la mejor solución en dicha iteración")+
-  theme(plot.title = element_text(hjust = 0.5))
+get_best_sol <- function(solution, iteration){
+  return(solution@bestSol[[round(iteration)]][1, ])
+}
 
-# ggplot() +  geom_line(color="darkblue", size=1, aes(x=no_iter, y=best_fitness)) + theme(plot.title = element_text(hjust = 0.5)) +
-#   labs(title = "Mejor fitness por iteración aplicando la distancia de Manhattan",x="Número de iteraciones", y="Fitness de la mejor solución en dicha iteración")
-  
+correct_image_row_order <- list()
+correct_image_row_order[[as.character(round(maxIter/3))]] <- get_best_sol(TSP_resolver, maxIter/3)-1
+correct_image_row_order[[as.character(round(maxIter*2/3))]] <- get_best_sol(TSP_resolver, maxIter*2/3)-1
+correct_image_row_order[[as.character(round(maxIter))]] <- get_best_sol(TSP_resolver, maxIter)-1
+
+write.table(correct_image_row_order, file=paste("images\\",imageNumber,"\\",distanceMeasure,"\\row_order.csv", sep=""), sep=",")
 
 # Guardamos checkpoints de las imagenes a cada tercio de ejecución
-write.table(image[TSP_resolver@bestSol[[round(maxIter/3)]][1, ], ], row.names = FALSE, col.names = FALSE,
-            file = paste("images\\",imageNumber,"\\",distanceMeasure,"\\nice_",round(maxIter/3),"_",distanceMeasure,".txt", sep = ""))
-
-write.table(image[TSP_resolver@bestSol[[round(maxIter*2/3)]][1, ], ], row.names = FALSE, col.names = FALSE,
-            file = paste("images\\",imageNumber,"\\",distanceMeasure,"\\nice_",round(maxIter*2/3),"_",distanceMeasure,".txt", sep = ""))
-
-write.table(image[TSP_resolver@bestSol[[maxIter]][1, ], ], row.names = FALSE, col.names = FALSE,
-            file = paste("images\\",imageNumber,"\\",distanceMeasure,"\\nice_",maxIter,"_",distanceMeasure,".txt", sep = ""))
-
-
+# write.table(image[TSP_resolver@bestSol[[round(maxIter/3)]][1, ], ], row.names = FALSE, col.names = FALSE,
+#             file = paste("images\\",imageNumber,"\\",distanceMeasure,"\\nice_",round(maxIter/3),"_",distanceMeasure,".txt", sep = ""))
+# 
+# write.table(image[TSP_resolver@bestSol[[round(maxIter*2/3)]][1, ], ], row.names = FALSE, col.names = FALSE,
+#             file = paste("images\\",imageNumber,"\\",distanceMeasure,"\\nice_",round(maxIter*2/3),"_",distanceMeasure,".txt", sep = ""))
+# 
+# write.table(image[TSP_resolver@bestSol[[maxIter]][1, ], ], row.names = FALSE, col.names = FALSE,
+#             file = paste("images\\",imageNumber,"\\",distanceMeasure,"\\nice_",maxIter,"_",distanceMeasure,".txt", sep = ""))
 
